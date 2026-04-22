@@ -963,8 +963,19 @@ function showDashboard() { if (currentUser) loadDashboard(); }
 
 function showProfile() {
   showPage('profile');
-  document.getElementById('p-name').value  = currentUser.name  || '';
-  document.getElementById('p-email').value = currentUser.email || '';
+  document.getElementById('p-name').value     = currentUser.name         || '';
+  document.getElementById('p-email').value    = currentUser.email        || '';
+  document.getElementById('p-dob').value      = currentUser.dob          || '';
+  document.getElementById('p-phone').value    = currentUser.phone        || '';
+  document.getElementById('p-location').value = currentUser.location     || '';
+  document.getElementById('p-bio').value      = currentUser.bio          || '';
+  document.getElementById('p-rate').value     = currentUser.hourlyRate   || '';
+  document.getElementById('p-exp').value      = currentUser.experience   || '';
+  document.getElementById('p-avail').value    = currentUser.availability || '';
+  document.getElementById('p-github').value   = currentUser.github       || '';
+  document.getElementById('p-linkedin').value = currentUser.linkedin     || '';
+  profileSkills = Array.isArray(currentUser.skills) ? [...currentUser.skills] : [];
+  renderSkills();
   updateProgress();
   hideUserMenu();
 }
@@ -1242,14 +1253,47 @@ function updateProgress() {
   document.getElementById('profile-pct').textContent = `${pct}%`;
   document.getElementById('profile-bar').style.width = `${pct}%`;
 }
-function saveProfile() {
-  const name = document.getElementById('p-name').value.trim();
-  if (name) {
-    currentUser.name = name;
-    localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
-    setupNav();
+async function saveProfile() {
+  const safeUserId = currentUser?._id || currentUser?.id;
+  if (!safeUserId) return showToast('Session error. Please log in again.', 'error');
+
+  const profileData = {
+    userId:       safeUserId,
+    name:         document.getElementById('p-name').value.trim(),
+    email:        document.getElementById('p-email').value.trim(),
+    dob:          document.getElementById('p-dob').value,
+    phone:        document.getElementById('p-phone').value.trim(),
+    location:     document.getElementById('p-location').value.trim(),
+    bio:          document.getElementById('p-bio').value.trim(),
+    skills:       profileSkills,
+    hourlyRate:   Number(document.getElementById('p-rate').value) || 0,
+    experience:   document.getElementById('p-exp').value,
+    availability: document.getElementById('p-avail').value,
+    github:       document.getElementById('p-github').value.trim(),
+    linkedin:     document.getElementById('p-linkedin').value.trim(),
+  };
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/profile', {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(profileData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      currentUser = { ...currentUser, ...data.user };
+      localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
+      setupNav();
+      showToast('Profile saved! ✅', 'success');
+    } else {
+      showToast(data.message || 'Failed to save profile.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Cannot connect to server.', 'error');
   }
-  showToast('Profile saved! ✅', 'success');
 }
 
 // ============================================================

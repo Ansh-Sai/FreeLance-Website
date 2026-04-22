@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FREESURF — Freelance Reimagined</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080b14;
+    --surface: #0e1422;
+    --surface2: #141926;
+    --border: rgba(99,179,237,0.12);
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  h1,h2,h3,h4,.font-display { font-family: 'Syne', sans-serif; }
+
+  /* Blobs */
+  .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.13; pointer-events: none; z-index: 0; animation: blobFloat 14s ease-in-out infinite alternate; }
+  .blob-1 { width: 520px; height: 520px; background: radial-gradient(circle, #38bdf8, transparent); top: -120px; left: -100px; animation-delay: 0s; }
+  .blob-2 { width: 400px; height: 400px; background: radial-gradient(circle, #818cf8, transparent); bottom: -80px; right: -60px; animation-delay: 5s; }
+  .blob-3 { width: 300px; height: 300px; background: radial-gradient(circle, #34d399, transparent); top: 40%; left: 55%; animation-delay: 9s; }
+  @keyframes blobFloat { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px, 20px) scale(1.07); } }
+
+  /* Glass card */
+  .glass { background: rgba(14,20,34,0.82); backdrop-filter: blur(18px); border: 1px solid var(--border); }
+  .glass-sm { background: rgba(20,25,38,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); }
+
+  /* Page system */
+  .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: block; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+
+  /* Inputs */
+  .inp { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(99,179,237,0.15); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.08); }
+  .inp::placeholder { color: var(--muted); }
+  textarea.inp { resize: vertical; min-height: 80px; }
+
+  /* Buttons */
+  .btn-primary { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff; border: none; border-radius: 10px; padding: 11px 22px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity .2s, transform .15s, box-shadow .2s; letter-spacing: 0.3px; }
+  .btn-primary:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(56,189,248,0.22); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(56,189,248,0.05); }
+  .btn-danger { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; transition: background .2s; }
+  .btn-danger:hover { background: rgba(248,113,113,0.22); }
+
+  /* Nav */
+  .navbar { position: sticky; top: 0; z-index: 50; padding: 0 24px; height: 62px; display: flex; align-items: center; justify-content: space-between; background: rgba(8,11,20,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+
+  /* Tab buttons */
+  .tab-btn { padding: 8px 22px; border-radius: 8px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .2s; border: 1px solid transparent; }
+  .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff; }
+  .tab-btn:not(.active) { color: var(--muted); border-color: var(--border); background: transparent; }
+  .tab-btn:not(.active):hover { color: var(--text); border-color: rgba(99,179,237,0.3); }
+
+  /* Role card */
+  .role-card { border: 2px solid var(--border); border-radius: 14px; padding: 18px 22px; cursor: pointer; transition: border-color .2s, background .2s; text-align: center; }
+  .role-card:hover { border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.04); }
+  .role-card.selected { border-color: var(--accent); background: rgba(56,189,248,0.06); }
+
+  /* Stat card */
+  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; transition: border-color .2s; }
+  .stat-card:hover { border-color: rgba(56,189,248,0.3); }
+
+  /* Project card */
+  .project-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: border-color .2s, transform .2s; }
+  .project-card:hover { border-color: rgba(56,189,248,0.25); transform: translateY(-2px); }
+
+  /* Tag */
+  .tag { display: inline-flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: var(--accent); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 500; }
+  .tag-green { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.2); color: var(--accent3); }
+  .tag-purple { background: rgba(129,140,248,0.08); border-color: rgba(129,140,248,0.2); color: var(--accent2); }
+  .skill-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.2); color: var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 13px; }
+  .skill-chip button { color: var(--muted); font-size: 15px; cursor: pointer; line-height: 1; background: none; border: none; }
+  .skill-chip button:hover { color: var(--danger); }
+
+  /* Badge */
+  .badge-open { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  .badge-progress { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+
+  /* Modal overlay */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 28px; right: 28px; z-index: 9999; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; color: #fff; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; min-width: 200px; }
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.35); }
+  #toast.error { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.35); }
+  #toast.info { background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35); }
+
+  /* Progress bar */
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 10px; transition: width .5s ease; }
+
+  /* OTP input */
+  .otp-box { width: 48px; height: 52px; text-align: center; font-size: 20px; font-family: 'Syne', sans-serif; font-weight: 700; background: rgba(255,255,255,0.04); border: 1px solid rgba(99,179,237,0.2); border-radius: 10px; color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s; }
+  .otp-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
+
+  /* Spinner */
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Navbar link */
+  .nav-link { color: var(--muted); font-size: 14px; font-family: 'Syne', sans-serif; cursor: pointer; padding: 6px 14px; border-radius: 8px; transition: color .2s, background .2s; }
+  .nav-link:hover, .nav-link.active { color: var(--text); background: rgba(255,255,255,0.04); }
+
+  /* Avatar */
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8, #818cf8); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: #fff; cursor: pointer; flex-shrink: 0; }
+
+  /* Sidebar nav for dashboards */
+  .sidebar { width: 220px; min-height: calc(100vh - 62px); background: rgba(14,20,34,0.5); border-right: 1px solid var(--border); padding: 24px 16px; flex-shrink: 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; color: var(--muted); font-size: 14px; cursor: pointer; transition: all .2s; margin-bottom: 4px; }
+  .sidebar-item:hover { background: rgba(56,189,248,0.06); color: var(--text); }
+  .sidebar-item.active { background: rgba(56,189,248,0.1); color: var(--accent); border: 1px solid rgba(56,189,248,0.15); }
+
+  /* Fade in */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp .5s ease forwards; }
+  .fade-up-d1 { animation-delay: .08s; opacity: 0; }
+  .fade-up-d2 { animation-delay: .16s; opacity: 0; }
+  .fade-up-d3 { animation-delay: .24s; opacity: 0; }
+  .fade-up-d4 { animation-delay: .32s; opacity: 0; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .mobile-tabs { display: flex !important; }
+  }
+  .mobile-tabs { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ===================== PAGE: AUTH ===================== -->
+<div id="page-auth" class="page active">
+  <div class="flex min-h-screen items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md fade-up">
+
+      <!-- Logo -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-400 flex items-center justify-center text-white font-display font-bold text-lg">F</div>
+          <span class="font-display text-2xl font-bold tracking-tight" style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+        </div>
+        <p class="text-sm" style="color:var(--muted)">Freelance Reimagined — Ride the wave of work.</p>
+      </div>
+
+      <!-- Auth card -->
+      <div class="glass rounded-2xl p-8">
+        <!-- Tabs -->
+        <div class="flex gap-2 p-1 rounded-xl mb-6" style="background:rgba(255,255,255,0.04);">
+          <button class="tab-btn flex-1 active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+          <button class="tab-btn flex-1" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div id="form-login">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email Address</label>
+              <input id="login-email" type="email" class="inp" placeholder="you@example.com"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Password</label>
+              <input id="login-password" type="password" class="inp" placeholder="••••••••"/>
+            </div>
+            <button class="btn-primary w-full mt-2 flex items-center justify-center gap-2" onclick="handleLogin()" id="btn-login">
+              <span>Continue</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SIGNUP FORM -->
+        <div id="form-signup" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Full Name</label>
+              <input id="signup-name" type="text" class="inp" placeholder="John Doe"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email Address</label>
+              <input id="signup-email" type="email" class="inp" placeholder="you@example.com"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Password</label>
+              <input id="signup-password" type="password" class="inp" placeholder="Min. 8 characters"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Confirm Password</label>
+              <input id="signup-confirm" type="password" class="inp" placeholder="Repeat password"/>
+            </div>
+            <!-- Role selection -->
+            <div>
+              <label class="block text-xs font-medium mb-2" style="color:var(--muted)">I am a…</label>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="role-card selected" id="role-freelancer" onclick="selectRole('freelancer')">
+                  <div class="text-2xl mb-1">👨‍💻</div>
+                  <div class="font-display font-600 text-sm" style="color:var(--text)">Freelancer</div>
+                  <div class="text-xs mt-0.5" style="color:var(--muted)">Find projects & bid</div>
+                </div>
+                <div class="role-card" id="role-company" onclick="selectRole('company')">
+                  <div class="text-2xl mb-1">🏢</div>
+                  <div class="font-display font-600 text-sm" style="color:var(--text)">Company</div>
+                  <div class="text-xs mt-0.5" style="color:var(--muted)">Post projects & hire</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary w-full mt-2 flex items-center justify-center gap-2" onclick="handleSignup()" id="btn-signup">
+              <span>Create Account</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: OTP ===================== -->
+<div id="page-otp" class="page">
+  <div class="flex min-h-screen items-center justify-center px-4">
+    <div class="w-full max-w-sm fade-up">
+      <div class="glass rounded-2xl p-8 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center mx-auto mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </div>
+        <h2 class="font-display text-xl font-bold mb-2">Verify your email</h2>
+        <p class="text-sm mb-1" style="color:var(--muted)">We sent a 6-digit OTP to</p>
+        <p class="text-sm font-medium mb-6" id="otp-email-display" style="color:var(--accent)">—</p>
+
+        <!-- OTP inputs -->
+        <div class="flex gap-2 justify-center mb-6" id="otp-inputs">
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,0)" onkeydown="otpBack(event,0)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,1)" onkeydown="otpBack(event,1)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,2)" onkeydown="otpBack(event,2)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,3)" onkeydown="otpBack(event,3)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,4)" onkeydown="otpBack(event,4)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,5)" onkeydown="otpBack(event,5)"/>
+        </div>
+
+        <button class="btn-primary w-full flex items-center justify-center gap-2" onclick="verifyOTP()" id="btn-verify-otp">
+          <span>Verify & Continue</span>
+        </button>
+
+        <div class="mt-4 flex items-center justify-center gap-2">
+          <span class="text-xs" style="color:var(--muted)">Didn't receive?</span>
+          <button class="text-xs font-medium" style="color:var(--accent);background:none;border:none;cursor:pointer;" onclick="resendOTP()" id="btn-resend">Resend OTP</button>
+        </div>
+        <div id="otp-timer" class="text-xs mt-1" style="color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== NAV (shared) ===================== -->
+<div id="main-nav" class="hidden">
+  <nav class="navbar">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-400 flex items-center justify-center text-white font-display font-bold text-sm">F</div>
+      <span class="font-display font-bold text-base" style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+    </div>
+    <div class="flex items-center gap-1 hidden md:flex" id="nav-links">
+      <button class="nav-link active" onclick="showDashboard()">Dashboard</button>
+      <button class="nav-link" onclick="showProfile()">Profile</button>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-xs px-2 py-1 rounded-full" id="nav-role-badge" style="background:rgba(56,189,248,0.1);color:var(--accent);border:1px solid rgba(56,189,248,0.2);font-family:'Syne',sans-serif;font-weight:600;"></div>
+      <div class="avatar" id="nav-avatar" onclick="toggleUserMenu()">U</div>
+      <div id="user-menu" class="hidden absolute right-4 top-16 glass-sm rounded-xl p-2 min-w-40 z-50">
+        <div class="px-3 py-2 border-b mb-1" style="border-color:var(--border)">
+          <div class="text-xs font-medium" id="menu-name" style="color:var(--text)">—</div>
+          <div class="text-xs mt-0.5" id="menu-email" style="color:var(--muted)">—</div>
+        </div>
+        <button class="w-full text-left px-3 py-2 text-xs rounded-lg transition-colors hover:bg-white/5" style="color:var(--muted);font-family:'DM Sans',sans-serif;" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- ===================== PAGE: FREELANCER DASHBOARD ===================== -->
+<div id="page-freelancer" class="page">
+  <div id="main-nav-f"></div>
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="sidebar hidden md:block">
+      <div class="space-y-1">
+        <div class="sidebar-item active" onclick="setFTab('projects')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Browse Projects
+        </div>
+        <div class="sidebar-item" onclick="setFTab('mybids')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> My Bids
+        </div>
+        <div class="sidebar-item" onclick="showProfile()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Profile
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 max-w-5xl">
+      <!-- Welcome -->
+      <div class="mb-6 fade-up">
+        <h1 class="font-display text-2xl font-bold mb-1">Good to see you, <span id="f-name-display">Freelancer</span> 👋</h1>
+        <p class="text-sm" style="color:var(--muted)">Here's what's happening on FREESURF today.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 fade-up fade-up-d1">
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Active Bids</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent)" id="stat-bids">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Projects Won</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent3)">3</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Earnings</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent2)">$4,200</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Rating</div>
+          <div class="font-display text-2xl font-bold" style="color:#fbbf24">4.8 ⭐</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div id="f-tab-projects">
+        <div class="flex items-center justify-between mb-4 fade-up fade-up-d2">
+          <h2 class="font-display font-bold text-base">Available Projects</h2>
+          <div class="text-xs" style="color:var(--muted)" id="project-count">— projects</div>
+        </div>
+        <div id="projects-list" class="space-y-4 fade-up fade-up-d3"></div>
+      </div>
+
+      <div id="f-tab-mybids" class="hidden">
+        <h2 class="font-display font-bold text-base mb-4">My Submitted Bids</h2>
+        <div id="mybids-list" class="space-y-4"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== PAGE: COMPANY DASHBOARD ===================== -->
+<div id="page-company" class="page">
+  <div class="flex">
+    <aside class="sidebar hidden md:block">
+      <div class="space-y-1">
+        <div class="sidebar-item active" onclick="setCTab('projects')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> My Projects
+        </div>
+        <div class="sidebar-item" onclick="showProfile()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Profile
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 p-6 max-w-5xl">
+      <div class="mb-6 fade-up flex items-center justify-between">
+        <div>
+          <h1 class="font-display text-2xl font-bold mb-1">Company Dashboard 🏢</h1>
+          <p class="text-sm" style="color:var(--muted)">Manage your posted projects and incoming bids.</p>
+        </div>
+        <button class="btn-primary flex items-center gap-2" onclick="openPostModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Post Project
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-3 gap-4 mb-8 fade-up fade-up-d1">
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Total Projects</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent)" id="c-stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Bids Received</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent3)" id="c-stat-bids">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">In Progress</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent2)" id="c-stat-progress">0</div>
+        </div>
+      </div>
+
+      <div id="company-projects-list" class="space-y-4 fade-up fade-up-d2"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== PAGE: PROFILE ===================== -->
+<div id="page-profile" class="page">
+  <main class="max-w-2xl mx-auto p-6">
+    <div class="flex items-center justify-between mb-6 fade-up">
+      <div>
+        <h1 class="font-display text-2xl font-bold">My Profile</h1>
+        <p class="text-sm mt-0.5" style="color:var(--muted)">Keep your info up to date.</p>
+      </div>
+      <button class="btn-ghost" onclick="showDashboard()">← Back</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d1">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-medium" style="font-family:'Syne',sans-serif;">Profile Completion</span>
+        <span class="text-sm font-bold" id="profile-pct" style="color:var(--accent)">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="profile-bar" style="width:0%"></div></div>
+    </div>
+
+    <!-- Info -->
+    <div class="glass rounded-2xl p-6 space-y-4 mb-5 fade-up fade-up-d2">
+      <h3 class="font-display font-bold text-sm mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Personal Info</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Full Name</label>
+          <input id="p-name" type="text" class="inp" placeholder="John Doe" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email</label>
+          <input id="p-email" type="email" class="inp" placeholder="you@example.com" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Date of Birth</label>
+          <input id="p-dob" type="date" class="inp" oninput="updateProgress()" style="color-scheme:dark;"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Phone</label>
+          <input id="p-phone" type="tel" class="inp" placeholder="+91 98765 43210" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Location</label>
+          <input id="p-location" type="text" class="inp" placeholder="Bangalore, India" oninput="updateProgress()"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Bio</label>
+        <textarea id="p-bio" class="inp" placeholder="Tell clients about yourself..." oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d3">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Skills</h3>
+      <div id="skills-container" class="flex flex-wrap gap-2 mb-3"></div>
+      <div class="flex gap-2">
+        <input id="skill-input" type="text" class="inp" placeholder="Add a skill (e.g. React)" onkeydown="if(event.key==='Enter'){addSkill();}"/>
+        <button class="btn-primary px-4" onclick="addSkill()">Add</button>
+      </div>
+    </div>
+
+    <!-- Work Preferences -->
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d4">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Work Preferences</h3>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Hourly Rate ($)</label>
+          <input id="p-rate" type="number" class="inp" placeholder="50" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Experience</label>
+          <select id="p-exp" class="inp" oninput="updateProgress()" style="cursor:pointer;">
+            <option value="" style="background:#0e1422;">Select level</option>
+            <option value="beginner" style="background:#0e1422;">Beginner</option>
+            <option value="intermediate" style="background:#0e1422;">Intermediate</option>
+            <option value="expert" style="background:#0e1422;">Expert</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Availability</label>
+          <select id="p-avail" class="inp" oninput="updateProgress()" style="cursor:pointer;">
+            <option value="" style="background:#0e1422;">Select</option>
+            <option value="fulltime" style="background:#0e1422;">Full-time</option>
+            <option value="parttime" style="background:#0e1422;">Part-time</option>
+            <option value="freelance" style="background:#0e1422;">Freelance Only</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="glass rounded-2xl p-6 mb-6 fade-up">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Links</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">GitHub</label>
+          <input id="p-github" type="url" class="inp" placeholder="https://github.com/you" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">LinkedIn</label>
+          <input id="p-linkedin" type="url" class="inp" placeholder="https://linkedin.com/in/you" oninput="updateProgress()"/>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary w-full py-3 fade-up" onclick="saveProfile()">Save Profile</button>
+  </main>
+</div>
+
+<!-- ===================== MODAL: BID ===================== -->
+<div class="modal-overlay" id="modal-bid">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display font-bold text-lg">Place Your Bid</h3>
+      <button class="btn-ghost px-3 py-1.5 text-xs" onclick="closeBidModal()">✕</button>
+    </div>
+    <div id="bid-project-info" class="glass-sm rounded-xl p-4 mb-5 text-sm" style="color:var(--muted)"></div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Your Bid Amount ($)</label>
+        <input id="bid-amount" type="number" class="inp" placeholder="e.g. 800"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Proposal / Cover Letter</label>
+        <textarea id="bid-proposal" class="inp" placeholder="Describe your approach, experience, timeline..."></textarea>
+      </div>
+      <button class="btn-primary px-4 py-2" onclick="submitBid()">Submit Bid</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: POST PROJECT ===================== -->
+<div class="modal-overlay" id="modal-post">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display font-bold text-lg">Post a New Project</h3>
+      <button class="btn-ghost px-3 py-1.5 text-xs" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Project Title</label>
+        <input id="post-title" type="text" class="inp" placeholder="e.g. Build a React E-commerce App"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Description</label>
+        <textarea id="post-desc" class="inp" placeholder="Describe what you need..."></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Budget ($)</label>
+          <input id="post-budget" type="number" class="inp" placeholder="2000"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Deadline</label>
+          <input id="post-deadline" type="date" class="inp" style="color-scheme:dark;"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Required Skills (comma-separated)</label>
+        <input id="post-skills" type="text" class="inp" placeholder="React, Node.js, MongoDB"/>
+      </div>
+      <button class="btn-primary w-full" onclick="postProject()">Post Project</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+
+    // Attach the event listener to the form
+    const postProjectForm = document.getElementById('post-project-form');
+    
+    // Make sure the form actually exists on this page before adding listener
+    if (postProjectForm) { 
+        postProjectForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+            
+            // ... (Insert all the POST logic from Step 2 here) ...
+            
+        });
+    }
+});
+// ============================================================
+// EMAILJS CONFIG — Replace with your actual keys
+// ============================================================
+const EMAILJS_PUBLIC_KEY  = 'LWuZwk37r9Cldq856';   // e.g. 'user_abc123'
+const EMAILJS_SERVICE_ID  = 'service_009ihwu';   // e.g. 'service_xyz'
+const EMAILJS_OTP_TEMPLATE = 'template_6y4aick';   // Template for OTP
+const EMAILJS_CONFIRM_TEMPLATE = 'template_uxoj5cd'; // Template for login confirm
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ============================================================
+// APP STATE
+// ============================================================
+let currentUser = null;
+let selectedRole = 'freelancer';
+let pendingOTP = null;
+let pendingSignupData = null;
+let otpTimerInterval = null;
+let submittedBids = {};
+let currentBidProject = null;
+
+
+// ============================================================
+// AUTH HELPERS
+// ============================================================
+function switchAuthTab(tab) {
+  document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('form-signup').classList.toggle('hidden', tab !== 'signup');
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+}
+
+function selectRole(role) {
+  selectedRole = role;
+  document.getElementById('role-freelancer').classList.toggle('selected', role === 'freelancer');
+  document.getElementById('role-company').classList.toggle('selected', role === 'company');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.innerHTML = `<span class="spinner"></span><span>Please wait...</span>`;
+    btn.disabled = true;
+  } else {
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showToast('Enter a valid email address.','error');
+  if (!password || password.length < 6) return showToast('Password must be at least 6 characters.','error');
+
+  setLoading('btn-login', true);
+
+  try {
+    // Talk to our REAL Node.js Backend
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+    setLoading('btn-login', false);
+    document.getElementById('btn-login').innerHTML = '<span>Continue</span>';
+
+    if (response.ok) {
+      // Login Success!
+      currentUser = data.user; 
+      localStorage.setItem('freesurf_user', JSON.stringify(currentUser)); // Keep session active
+      showToast('Logged in successfully! 👋', 'success');
+      loadDashboard();
+    } else {
+      // Show error from backend (e.g., "Invalid email or password")
+      showToast(data.message || 'Login failed', 'error');
+    }
+  } catch (error) {
+    setLoading('btn-login', false);
+    document.getElementById('btn-login').innerHTML = '<span>Continue</span>';
+    showToast('Cannot connect to backend server. Is it running?', 'error');
+  }
+}
+
+// ============================================================
+// SIGNUP
+// ============================================================
+function handleSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm = document.getElementById('signup-confirm').value;
+
+  if (!name) return showToast('Please enter your name.','error');
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showToast('Enter a valid email.','error');
+  if (password.length < 8) return showToast('Password must be at least 8 characters.','error');
+  if (password !== confirm) return showToast('Passwords do not match.','error');
+
+  setLoading('btn-signup', true);
+  pendingSignupData = { name, email, password, role: selectedRole };
+  // OTP + welcome email sent only on signup (login goes directly to dashboard)
+
+  setTimeout(() => {
+    setLoading('btn-signup', false);
+    document.getElementById('btn-signup').innerHTML = '<span>Create Account</span>';
+    startOTP(email, 'signup');
+  }, 600);
+}
+
+// ============================================================
+// OTP SYSTEM
+// ============================================================
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function startOTP(email, context) {
+  pendingOTP = generateOTP();
+  document.getElementById('otp-email-display').textContent = email;
+  clearOTPInputs();
+  showPage('otp');
+  startOTPTimer(120);
+
+  // Send OTP via EmailJS
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_OTP_TEMPLATE, {
+    to_email: email,
+    to_name: pendingSignupData ? pendingSignupData.name : (currentUser ? currentUser.name : 'User'),
+    otp: pendingOTP,
+    context: context === 'signup' ? 'sign up' : 'log in',
+  }).then(() => {
+    showToast('OTP sent to your email! ✉️', 'success');
+  }).catch(err => {
+    console.warn('EmailJS OTP send failed:', err);
+    showToast(`OTP: ${pendingOTP} (EmailJS not configured — check console)`, 'info');
+  });
+
+  // Focus first input
+  setTimeout(() => { document.querySelectorAll('.otp-box')[0].focus(); }, 200);
+}
+
+function clearOTPInputs() {
+  document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+}
+
+function otpNav(input, idx) {
+  input.value = input.value.replace(/\D/g, '').slice(-1);
+  if (input.value && idx < 5) {
+    document.querySelectorAll('.otp-box')[idx + 1].focus();
+  }
+}
+
+function otpBack(e, idx) {
+  if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+    document.querySelectorAll('.otp-box')[idx - 1].focus();
+  }
+}
+
+function getEnteredOTP() {
+  return [...document.querySelectorAll('.otp-box')].map(b => b.value).join('');
+}
+
+async function verifyOTP() {
+  const entered = getEnteredOTP();
+  if (entered.length < 6) return showToast('Please enter all 6 digits.', 'error');
+
+  setLoading('btn-verify-otp', true);
+
+  if (entered === pendingOTP) {
+    clearInterval(otpTimerInterval);
+    
+    try {
+      // OTP is correct! Now save the user to our REAL MongoDB Database
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pendingSignupData)
+      });
+
+      const data = await response.json();
+      
+      document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+      document.getElementById('btn-verify-otp').disabled = false;
+
+      if (response.ok) {
+        currentUser = data.user;
+        localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
+
+        // Send welcome email
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_CONFIRM_TEMPLATE, {
+          to_email: currentUser.email,
+          to_name: currentUser.name,
+          action: 'Account Created',
+        }).catch(()=>{});
+
+        pendingSignupData = null;
+        pendingOTP = null;
+        showToast('Welcome to FREESURF! 🏄', 'success');
+        loadDashboard();
+      } else {
+        // Backend said user already exists, or other error
+        showToast(data.message || 'Signup failed', 'error');
+      }
+    } catch (error) {
+       document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+       document.getElementById('btn-verify-otp').disabled = false;
+       showToast('Cannot connect to backend server. Is it running?', 'error');
+    }
+  } else {
+    document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+    document.getElementById('btn-verify-otp').disabled = false;
+    showToast('Incorrect OTP. Try again.', 'error');
+  }
+}
+
+function resendOTP() {
+  const email = document.getElementById('otp-email-display').textContent;
+  clearOTPInputs();
+  startOTP(email, 'signup');
+  showToast('OTP resent!', 'info');
+}
+
+function startOTPTimer(seconds) {
+  clearInterval(otpTimerInterval);
+  let s = seconds;
+  const el = document.getElementById('otp-timer');
+  const resendBtn = document.getElementById('btn-resend');
+  resendBtn.disabled = true;
+  resendBtn.style.opacity = '0.4';
+  function tick() {
+    el.textContent = `Resend available in ${s}s`;
+    if (s <= 0) {
+      clearInterval(otpTimerInterval);
+      el.textContent = '';
+      resendBtn.disabled = false;
+      resendBtn.style.opacity = '1';
+    }
+    s--;
+  }
+  tick();
+  otpTimerInterval = setInterval(tick, 1000);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function loadDashboard() {
+  setupNav();
+  if (currentUser.role === 'freelancer') {
+    showPage('freelancer');
+    document.getElementById('f-name-display').textContent = currentUser.name.split(' ')[0];
+    fetchAndDisplayProjects(); // Fetch from DB instead of local array
+  } else {
+    showPage('company');
+    fetchAndDisplayProjects(); // Fetch from DB instead of local array
+  }
+}
+
+function setupNav() {
+  const nav = document.getElementById('main-nav');
+  nav.classList.remove('hidden');
+  document.getElementById('nav-role-badge').textContent = currentUser.role === 'freelancer' ? '👨‍💻 Freelancer' : '🏢 Company';
+  const av = document.getElementById('nav-avatar');
+  av.textContent = currentUser.name[0].toUpperCase();
+  document.getElementById('menu-name').textContent = currentUser.name;
+  document.getElementById('menu-email').textContent = currentUser.email;
+  // Clone nav into correct page
+  const fNav = document.getElementById('main-nav-f');
+  if (fNav) fNav.innerHTML = '';
+}
+
+function showDashboard() {
+  if (!currentUser) return;
+  loadDashboard();
+}
+
+function showProfile() {
+  showPage('profile');
+  document.getElementById('p-name').value = currentUser.name || '';
+  document.getElementById('p-email').value = currentUser.email || '';
+  updateProgress();
+  hideUserMenu();
+}
+
+// ============================================================
+// FREELANCER — PROJECTS
+// ============================================================
+
+
+function setFTab(tab) {
+  document.getElementById('f-tab-projects').classList.toggle('hidden', tab !== 'projects');
+  document.getElementById('f-tab-mybids').classList.toggle('hidden', tab !== 'mybids');
+  document.querySelectorAll('.sidebar-item').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'projects' && i === 0) || (tab === 'mybids' && i === 1));
+  });
+  if (tab === 'mybids') renderMyBids();
+}
+
+function renderMyBids() {
+  const list = document.getElementById('mybids-list');
+  const bids = Object.entries(submittedBids);
+  if (!bids.length) {
+    list.innerHTML = `<div class="glass rounded-2xl p-8 text-center" style="color:var(--muted)">No bids submitted yet. Browse projects to start!</div>`;
+    return;
+  }
+  list.innerHTML = bids.map(([pid, b]) => {
+    const project = sampleProjects.find(p => p.id === +pid);
+    return `<div class="project-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-display font-bold text-base mb-1">${project?.title || 'Project'}</h3>
+          <p class="text-xs mb-3" style="color:var(--muted)">${project?.company || ''}</p>
+          <p class="text-sm" style="color:var(--muted)">"${b.proposal.slice(0,80)}${b.proposal.length>80?'…':''}"</p>
+        </div>
+        <div class="text-right flex-shrink-0 ml-4">
+          <div class="font-display font-bold text-lg" style="color:var(--accent)">$${b.amount}</div>
+          <span class="tag-green mt-1 block">Submitted</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// BID MODAL
+// ============================================================
+function openBidModal(projectId) {
+    currentBidProjectId = projectId; 
+    
+    const bidModal = document.getElementById('modal-bid'); // Corrected ID
+    if (bidModal) {
+        bidModal.classList.add('open'); // Corrected class trigger
+    } else {
+        console.error("Could not find the element with id='modal-bid'");
+    }
+}
+
+function closeBidModal() {
+    const bidModal = document.getElementById('modal-bid');
+    if (bidModal) {
+        bidModal.classList.remove('open');
+    }
+}
+
+async function submitBid() {
+    // Assuming your modal has these input IDs and stores the active project ID
+    const amount = document.getElementById('bid-amount').value;
+    const proposal = document.getElementById('bid-proposal').value;
+    const projectId = currentBidProjectId; // Make sure this variable is set when you open the modal!
+
+    if (!amount || amount <= 0) return showToast('Enter a valid bid amount.', 'error');
+
+    const bidData = {
+        projectId: projectId,
+        freelancerId: currentUser._id, // Sending the logged-in user's Mongo ID
+        amount: Number(amount),
+        proposal: proposal
+    };
+
+    try {
+        const response = await fetch('http://localhost:5000/api/bids', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bidData)
+        });
+
+        if (response.ok) {
+            closeBidModal();
+            showToast('Bid placed successfully! 🎉', 'success');
+            
+            // Clear the form
+            document.getElementById('bid-amount').value = '';
+            document.getElementById('bid-proposal').value = '';
+            
+            // Reload projects to update UI (show the "Submitted" badge)
+            fetchAndDisplayProjects(); 
+        } else {
+            const errorData = await response.json();
+            showToast(`Failed: ${errorData.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error submitting bid:', error);
+        showToast('Cannot connect to server.', 'error');
+    }
+}
+
+// ============================================================
+// COMPANY DASHBOARD
+// ============================================================
+
+function setCTab(tab) { renderCompanyProjects(); }
+
+function openPostModal() { document.getElementById('modal-post').classList.add('open'); }
+function closePostModal() { document.getElementById('modal-post').classList.remove('open'); }
+
+async function postProject() {
+  const title = document.getElementById('post-title').value.trim();
+  const description = document.getElementById('post-desc').value.trim();
+  const budget = document.getElementById('post-budget').value;
+
+  if (!title) return showToast('Project title is required.','error');
+  if (!description) return showToast('Description is required.','error');
+  if (!budget || +budget <= 0) return showToast('Enter a valid budget.','error');
+
+  const projectData = { title, description, budget };
+
+  try {
+      const response = await fetch('http://localhost:5000/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(projectData)
+      });
+
+      if (response.ok) {
+          closePostModal();
+          showToast('Project posted to Database! 🚀', 'success');
+          
+          // Clear form fields
+          document.getElementById('post-title').value = '';
+          document.getElementById('post-desc').value = '';
+          document.getElementById('post-budget').value = '';
+          
+          // Reload the list from the database
+          fetchAndDisplayProjects();
+      } else {
+          const errorData = await response.json();
+          showToast(`Failed: ${errorData.message}`, 'error');
+      }
+  } catch (error) {
+      console.error('Error posting project:', error);
+      showToast('Cannot connect to server.', 'error');
+  }
+}
+
+// Function to fetch projects from the backend
+// ============================================================
+// DATABASE API FETCH & RENDER
+// ============================================================
+
+async function fetchAndDisplayProjects() {
+    try {
+        const response = await fetch('http://localhost:5000/api/projects');
+        if (!response.ok) throw new Error('Failed to fetch projects');
+        const projects = await response.json();
+
+        // Route the data based on the user's role
+        if (currentUser.role === 'freelancer') {
+            renderProjects(projects);
+        } else {
+            renderCompanyProjects(projects);
+        }
+    } catch (error) {
+        console.error('Error fetching projects:', error);
+        showToast('Failed to load projects from database.', 'error');
+    }
+}
+
+function renderProjects(projects) {
+  const list = document.getElementById('projects-list');
+  document.getElementById('project-count').textContent = `${projects.length} projects`;
+  
+  if (projects.length === 0) {
+      list.innerHTML = '<p class="text-gray-500 text-sm">No projects available right now.</p>';
+      return;
+  }
+
+  list.innerHTML = projects.map(p => {
+    // Assuming 'p._id' is the MongoDB ID
+    const bid = submittedBids[p._id]; 
+    return `
+    <div class="project-card">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <div>
+          <h3 class="font-display font-bold text-base mb-0.5">${p.title}</h3>
+          <p class="text-xs" style="color:var(--muted)">Budget: $${p.budget}</p>
+        </div>
+        <span class="badge-open flex-shrink-0">Open</span>
+      </div>
+      <p class="text-sm mb-4" style="color:var(--text)">${p.description}</p>
+      <div class="flex items-center justify-between">
+        ${bid
+          ? `<div class="flex items-center gap-2">
+               <span class="text-xs" style="color:var(--accent3)">✓ Bid $${bid.amount}</span>
+               <span class="tag-green">Submitted</span>
+             </div>`
+          : `<button class="btn-primary px-4 py-2 text-sm" onclick="openBidModal('${p._id}')">Place Bid</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCompanyProjects(projects) {
+  const list = document.getElementById('company-projects-list');
+  
+  document.getElementById('c-stat-total').textContent = projects.length;
+  // Note: Bids/In-progress stats will need backend routes later, setting to 0 for now
+  document.getElementById('c-stat-bids').textContent = '0';
+  document.getElementById('c-stat-progress').textContent = '0';
+
+  if (projects.length === 0) {
+      list.innerHTML = '<p class="text-gray-500 text-sm">You haven\'t posted any projects yet.</p>';
+      return;
+  }
+
+  list.innerHTML = projects.map(p => `
+    <div class="project-card">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <div>
+          <h3 class="font-display font-bold text-base mb-0.5">${p.title}</h3>
+          <p class="text-sm mt-2" style="color:var(--text)">${p.description}</p>
+        </div>
+        <span class="badge-open flex-shrink-0">Open</span>
+      </div>
+      <div class="flex items-center justify-between text-xs mt-4" style="color:var(--muted)">
+        <div class="flex gap-4">
+          <span>💰 <strong style="color:var(--text)">$${p.budget.toLocaleString()}</strong></span>
+        </div>
+        <button class="btn-ghost px-3 py-1.5 text-xs" onclick="showToast('Bid management coming soon!','info')">View Bids</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+let profileSkills = [];
+
+function addSkill() {
+  const inp = document.getElementById('skill-input');
+  const val = inp.value.trim();
+  if (!val || profileSkills.includes(val)) { inp.value = ''; return; }
+  profileSkills.push(val);
+  inp.value = '';
+  renderSkills();
+  updateProgress();
+}
+
+function removeSkill(skill) {
+  profileSkills = profileSkills.filter(s => s !== skill);
+  renderSkills();
+  updateProgress();
+}
+
+function renderSkills() {
+  document.getElementById('skills-container').innerHTML = profileSkills.map(s =>
+    `<span class="skill-chip">${s}<button onclick="removeSkill('${s}')">×</button></span>`
+  ).join('');
+}
+
+function updateProgress() {
+  const fields = ['p-name','p-email','p-dob','p-phone','p-location','p-bio','p-rate','p-github','p-linkedin'];
+  let filled = fields.filter(id => document.getElementById(id)?.value?.trim()).length;
+  const expEl = document.getElementById('p-exp'); if (expEl?.value) filled++;
+  const availEl = document.getElementById('p-avail'); if (availEl?.value) filled++;
+  if (profileSkills.length > 0) filled++;
+  const total = fields.length + 3;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('profile-pct').textContent = `${pct}%`;
+  document.getElementById('profile-bar').style.width = `${pct}%`;
+}
+
+function saveProfile() {
+  const name = document.getElementById('p-name').value.trim();
+  if (name) { currentUser.name = name; localStorage.setItem('freesurf_user', JSON.stringify(currentUser)); setupNav(); }
+  showToast('Profile saved! ✅','success');
+}
+
+// ============================================================
+// PAGE SYSTEM
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(`page-${name}`);
+  if (page) page.classList.add('active');
+  const showNav = ['freelancer','company','profile'].includes(name);
+  document.getElementById('main-nav').classList.toggle('hidden', !showNav);
+}
+
+// ============================================================
+// LOGOUT
+// ============================================================
+function handleLogout() {
+  currentUser = null;
+  submittedBids = {};
+  pendingOTP = null;
+  pendingSignupData = null;
+  showPage('auth');
+  document.getElementById('main-nav').classList.add('hidden');
+  hideUserMenu();
+  showToast('Logged out. See you around! 👋','info');
+}
+
+function toggleUserMenu() {
+  const menu = document.getElementById('user-menu');
+  menu.classList.toggle('hidden');
+}
+function hideUserMenu() { document.getElementById('user-menu').classList.add('hidden'); }
+document.addEventListener('click', e => {
+  const menu = document.getElementById('user-menu');
+  if (!menu.classList.contains('hidden') && !e.target.closest('#nav-avatar') && !e.target.closest('#user-menu')) {
+    hideUserMenu();
+  }
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimeout;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { t.classList.remove('show'); }, 3200);
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// Init
+showPage('auth');
+</script>
+</body>
+</html>

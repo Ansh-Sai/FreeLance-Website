@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FREESURF — Freelance Reimagined</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080b14;
+    --surface: #0e1422;
+    --surface2: #141926;
+    --border: rgba(99,179,237,0.12);
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  h1,h2,h3,h4,.font-display { font-family: 'Syne', sans-serif; }
+
+  .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.13; pointer-events: none; z-index: 0; animation: blobFloat 14s ease-in-out infinite alternate; }
+  .blob-1 { width: 520px; height: 520px; background: radial-gradient(circle, #38bdf8, transparent); top: -120px; left: -100px; animation-delay: 0s; }
+  .blob-2 { width: 400px; height: 400px; background: radial-gradient(circle, #818cf8, transparent); bottom: -80px; right: -60px; animation-delay: 5s; }
+  .blob-3 { width: 300px; height: 300px; background: radial-gradient(circle, #34d399, transparent); top: 40%; left: 55%; animation-delay: 9s; }
+  @keyframes blobFloat { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px, 20px) scale(1.07); } }
+
+  .glass { background: rgba(14,20,34,0.82); backdrop-filter: blur(18px); border: 1px solid var(--border); }
+  .glass-sm { background: rgba(20,25,38,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); }
+
+  .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: block; }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+
+  .inp { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(99,179,237,0.15); border-radius: 10px; padding: 11px 14px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s, box-shadow .2s; }
+  .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.08); }
+  .inp::placeholder { color: var(--muted); }
+  textarea.inp { resize: vertical; min-height: 80px; }
+
+  .btn-primary { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff; border: none; border-radius: 10px; padding: 11px 22px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: opacity .2s, transform .15s, box-shadow .2s; letter-spacing: 0.3px; }
+  .btn-primary:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(56,189,248,0.22); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .btn-ghost:hover { border-color: var(--accent); background: rgba(56,189,248,0.05); }
+  .btn-danger { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; transition: background .2s; }
+  .btn-danger:hover { background: rgba(248,113,113,0.22); }
+
+  .navbar { position: sticky; top: 0; z-index: 50; padding: 0 24px; height: 62px; display: flex; align-items: center; justify-content: space-between; background: rgba(8,11,20,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+
+  .tab-btn { padding: 8px 22px; border-radius: 8px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .2s; border: 1px solid transparent; }
+  .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #818cf8); color: #fff; }
+  .tab-btn:not(.active) { color: var(--muted); border-color: var(--border); background: transparent; }
+  .tab-btn:not(.active):hover { color: var(--text); border-color: rgba(99,179,237,0.3); }
+
+  .role-card { border: 2px solid var(--border); border-radius: 14px; padding: 18px 22px; cursor: pointer; transition: border-color .2s, background .2s; text-align: center; }
+  .role-card:hover { border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.04); }
+  .role-card.selected { border-color: var(--accent); background: rgba(56,189,248,0.06); }
+
+  .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; transition: border-color .2s; }
+  .stat-card:hover { border-color: rgba(56,189,248,0.3); }
+
+  .project-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: border-color .2s, transform .2s; }
+  .project-card:hover { border-color: rgba(56,189,248,0.25); transform: translateY(-2px); }
+
+  .tag { display: inline-flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); color: var(--accent); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 500; }
+  .tag-green { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.2); color: var(--accent3); }
+  .tag-purple { background: rgba(129,140,248,0.08); border-color: rgba(129,140,248,0.2); color: var(--accent2); }
+  .skill-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.2); color: var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 13px; }
+  .skill-chip button { color: var(--muted); font-size: 15px; cursor: pointer; line-height: 1; background: none; border: none; }
+  .skill-chip button:hover { color: var(--danger); }
+
+  .badge-open { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  .badge-progress { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.25); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; }
+
+  #toast { position: fixed; bottom: 28px; right: 28px; z-index: 9999; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; color: #fff; opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; pointer-events: none; min-width: 200px; }
+  #toast.show { opacity: 1; transform: translateY(0); }
+  #toast.success { background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.35); }
+  #toast.error   { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.35); }
+  #toast.info    { background: rgba(56,189,248,0.15);  border: 1px solid rgba(56,189,248,0.35); }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 10px; transition: width .5s ease; }
+
+  .otp-box { width: 48px; height: 52px; text-align: center; font-size: 20px; font-family: 'Syne', sans-serif; font-weight: 700; background: rgba(255,255,255,0.04); border: 1px solid rgba(99,179,237,0.2); border-radius: 10px; color: var(--text); outline: none; transition: border-color .2s, box-shadow .2s; }
+  .otp-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.1); }
+
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .nav-link { color: var(--muted); font-size: 14px; font-family: 'Syne', sans-serif; cursor: pointer; padding: 6px 14px; border-radius: 8px; transition: color .2s, background .2s; }
+  .nav-link:hover, .nav-link.active { color: var(--text); background: rgba(255,255,255,0.04); }
+
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8, #818cf8); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: #fff; cursor: pointer; flex-shrink: 0; }
+
+  .sidebar { width: 220px; min-height: calc(100vh - 62px); background: rgba(14,20,34,0.5); border-right: 1px solid var(--border); padding: 24px 16px; flex-shrink: 0; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; color: var(--muted); font-size: 14px; cursor: pointer; transition: all .2s; margin-bottom: 4px; }
+  .sidebar-item:hover { background: rgba(56,189,248,0.06); color: var(--text); }
+  .sidebar-item.active { background: rgba(56,189,248,0.1); color: var(--accent); border: 1px solid rgba(56,189,248,0.15); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp .5s ease forwards; }
+  .fade-up-d1 { animation-delay: .08s; opacity: 0; }
+  .fade-up-d2 { animation-delay: .16s; opacity: 0; }
+  .fade-up-d3 { animation-delay: .24s; opacity: 0; }
+  .fade-up-d4 { animation-delay: .32s; opacity: 0; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .mobile-tabs { display: flex !important; }
+  }
+  .mobile-tabs { display: none; }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div id="toast"></div>
+
+<!-- ===================== PAGE: LANDING ===================== -->
+<div id="page-landing" class="page active">
+  <nav style="position:sticky;top:0;z-index:50;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(8,11,20,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#38bdf8,#818cf8);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:15px;">F</div>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost" style="padding:8px 20px;font-size:13px;" onclick="showPage('auth');switchAuthTab('login')">Log In</button>
+      <button class="btn-primary" style="padding:8px 20px;font-size:13px;" onclick="showPage('auth');switchAuthTab('signup')">Get Started Free</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section style="text-align:center;padding:90px 24px 70px;max-width:780px;margin:0 auto;">
+    <div class="fade-up" style="display:inline-flex;align-items:center;gap:8px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:20px;padding:5px 14px;margin-bottom:28px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#34d399;display:inline-block;"></span>
+      <span style="font-size:12px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;letter-spacing:0.04em;">NOW LIVE — OPEN BETA</span>
+    </div>
+    <h1 class="fade-up fade-up-d1" style="font-family:'Syne',sans-serif;font-size:clamp(2.4rem,6vw,3.8rem);font-weight:800;line-height:1.1;margin-bottom:22px;">
+      Where great work<br/>
+      <span style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">finds the right people.</span>
+    </h1>
+    <p class="fade-up fade-up-d2" style="font-size:1.1rem;color:var(--muted);line-height:1.7;max-width:520px;margin:0 auto 36px;">
+      FREESURF connects ambitious companies with world-class freelancers. Post projects, place bids, and close deals — all in one clean platform.
+    </p>
+    <div class="fade-up fade-up-d3" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" style="padding:13px 30px;font-size:15px;" onclick="showPage('auth');switchAuthTab('signup')">Start for Free →</button>
+      <button class="btn-ghost" style="padding:13px 30px;font-size:15px;" onclick="document.getElementById('features-section').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+    </div>
+    <p class="fade-up fade-up-d4" style="font-size:12px;color:var(--muted);margin-top:16px;">No credit card required · Free forever for freelancers</p>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="fade-up" style="max-width:860px;margin:0 auto 80px;padding:0 24px;">
+    <div style="background:rgba(14,20,34,0.7);border:1px solid var(--border);border-radius:16px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;overflow:hidden;">
+      <div style="padding:28px 20px;border-right:1px solid var(--border);">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">10K+</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Freelancers onboard</div>
+      </div>
+      <div style="padding:28px 20px;border-right:1px solid var(--border);">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,#34d399,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$2.4M</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Paid out to freelancers</div>
+      </div>
+      <div style="padding:28px 20px;">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,#818cf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">98%</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Client satisfaction rate</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="features-section" style="max-width:900px;margin:0 auto 90px;padding:0 24px;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:12px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">How It Works</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;margin-bottom:12px;">Simple. Fast. Effective.</h2>
+      <p style="color:var(--muted);font-size:15px;max-width:440px;margin:0 auto;">Three steps to get your project done or land your next client.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;">
+      <div style="background:rgba(14,20,34,0.7);border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(56,189,248,0.35)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;">1. Post a Project</div>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6;">Describe what you need, set a budget, and go live in minutes. Your project reaches thousands of verified freelancers instantly.</p>
+      </div>
+      <div style="background:rgba(14,20,34,0.7);border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(129,140,248,0.35)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;">2. Review Bids</div>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6;">Freelancers submit tailored proposals with their price and plan. Compare bids side-by-side and pick the perfect fit for your project.</p>
+      </div>
+      <div style="background:rgba(14,20,34,0.7);border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(52,211,153,0.35)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:8px;">3. Get It Done</div>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6;">Accept a bid, collaborate with your freelancer, and ship. Fast turnarounds, transparent communication, quality results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section style="max-width:900px;margin:0 auto 90px;padding:0 24px;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div style="font-size:12px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;">Platform Features</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;">Everything you need to succeed.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+      <div style="background:rgba(14,20,34,0.5);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="width:36px;height:36px;flex-shrink:0;border-radius:10px;background:rgba(56,189,248,0.1);display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Live Dashboard</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.5;">Track all your projects and bids in real-time from a clean, modern dashboard.</div>
+        </div>
+      </div>
+      <div style="background:rgba(14,20,34,0.5);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="width:36px;height:36px;flex-shrink:0;border-radius:10px;background:rgba(129,140,248,0.1);display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Secure Auth + OTP</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.5;">Email-verified accounts with OTP protection keep the platform safe and spam-free.</div>
+        </div>
+      </div>
+      <div style="background:rgba(14,20,34,0.5);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="width:36px;height:36px;flex-shrink:0;border-radius:10px;background:rgba(52,211,153,0.1);display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Freelancer Profiles</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.5;">Showcase skills, experience, and rates. Build a profile that wins clients over.</div>
+        </div>
+      </div>
+      <div style="background:rgba(14,20,34,0.5);border:1px solid var(--border);border-radius:14px;padding:22px 20px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="width:36px;height:36px;flex-shrink:0;border-radius:10px;background:rgba(251,191,36,0.1);display:flex;align-items:center;justify-content:center;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Competitive Bidding</div>
+          <div style="color:var(--muted);font-size:13px;line-height:1.5;">Transparent bidding system ensures companies get the best value for every project.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR WHO -->
+  <section style="max-width:900px;margin:0 auto 90px;padding:0 24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+      <div style="background:linear-gradient(135deg,rgba(56,189,248,0.07),rgba(56,189,248,0.03));border:1px solid rgba(56,189,248,0.2);border-radius:20px;padding:36px 32px;">
+        <div style="font-size:28px;margin-bottom:14px;">👨‍💻</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:12px;">For Freelancers</h3>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:9px;">
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#34d399;font-size:16px;">✓</span> Browse real, live projects</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#34d399;font-size:16px;">✓</span> Submit proposals in seconds</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#34d399;font-size:16px;">✓</span> Set your own rates & terms</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#34d399;font-size:16px;">✓</span> Build your freelance portfolio</li>
+        </ul>
+        <button class="btn-primary" style="margin-top:24px;width:100%;" onclick="showPage('auth');switchAuthTab('signup');selectRole('freelancer')">Join as Freelancer →</button>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(129,140,248,0.07),rgba(129,140,248,0.03));border:1px solid rgba(129,140,248,0.2);border-radius:20px;padding:36px 32px;">
+        <div style="font-size:28px;margin-bottom:14px;">🏢</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:12px;">For Companies</h3>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:9px;">
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#818cf8;font-size:16px;">✓</span> Post projects in under 2 mins</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#818cf8;font-size:16px;">✓</span> Receive competitive proposals</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#818cf8;font-size:16px;">✓</span> Review bids with full context</li>
+          <li style="display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);"><span style="color:#818cf8;font-size:16px;">✓</span> Hire confidently, ship faster</li>
+        </ul>
+        <button class="btn-primary" style="margin-top:24px;width:100%;background:linear-gradient(135deg,#818cf8,#38bdf8);" onclick="showPage('auth');switchAuthTab('signup');selectRole('company')">Post a Project →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section style="max-width:860px;margin:0 auto 90px;padding:0 24px;">
+    <div style="background:linear-gradient(135deg,rgba(56,189,248,0.1),rgba(129,140,248,0.1));border:1px solid rgba(56,189,248,0.2);border-radius:22px;padding:56px 40px;text-align:center;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;margin-bottom:14px;">Ready to ride the wave? 🏄</h2>
+      <p style="color:var(--muted);font-size:15px;margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto;">Join thousands of freelancers and companies already building great things on FREESURF.</p>
+      <button class="btn-primary" style="padding:14px 36px;font-size:15px;" onclick="showPage('auth');switchAuthTab('signup')">Create Your Free Account →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--border);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+    <span style="font-size:13px;color:var(--muted);">© 2025 FREESURF. Freelance Reimagined.</span>
+    <button class="btn-ghost" style="font-size:13px;padding:7px 18px;" onclick="showPage('auth');switchAuthTab('login')">Sign In</button>
+  </footer>
+</div>
+
+<!-- ===================== PAGE: AUTH ===================== -->
+<div id="page-auth" class="page">
+  <div class="flex min-h-screen items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md fade-up">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 mb-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-400 flex items-center justify-center text-white font-display font-bold text-lg">F</div>
+          <span class="font-display text-2xl font-bold tracking-tight" style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+        </div>
+        <p class="text-sm" style="color:var(--muted)">Freelance Reimagined — Ride the wave of work.</p>
+      </div>
+
+      <div class="glass rounded-2xl p-8">
+        <div class="flex gap-2 p-1 rounded-xl mb-6" style="background:rgba(255,255,255,0.04);">
+          <button class="tab-btn flex-1 active" id="tab-login"  onclick="switchAuthTab('login')">Login</button>
+          <button class="tab-btn flex-1"         id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="form-login">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email Address</label>
+              <input id="login-email" type="email" class="inp" placeholder="you@example.com"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Password</label>
+              <input id="login-password" type="password" class="inp" placeholder="••••••••"/>
+            </div>
+            <button class="btn-primary w-full mt-2 flex items-center justify-center gap-2" onclick="handleLogin()" id="btn-login">
+              <span>Continue</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="form-signup" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Full Name</label>
+              <input id="signup-name" type="text" class="inp" placeholder="John Doe"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email Address</label>
+              <input id="signup-email" type="email" class="inp" placeholder="you@example.com"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Password</label>
+              <input id="signup-password" type="password" class="inp" placeholder="Min. 8 characters"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Confirm Password</label>
+              <input id="signup-confirm" type="password" class="inp" placeholder="Repeat password"/>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-2" style="color:var(--muted)">I am a…</label>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="role-card selected" id="role-freelancer" onclick="selectRole('freelancer')">
+                  <div class="text-2xl mb-1">👨‍💻</div>
+                  <div class="font-display font-600 text-sm" style="color:var(--text)">Freelancer</div>
+                  <div class="text-xs mt-0.5" style="color:var(--muted)">Find projects & bid</div>
+                </div>
+                <div class="role-card" id="role-company" onclick="selectRole('company')">
+                  <div class="text-2xl mb-1">🏢</div>
+                  <div class="font-display font-600 text-sm" style="color:var(--text)">Company</div>
+                  <div class="text-xs mt-0.5" style="color:var(--muted)">Post projects & hire</div>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary w-full mt-2 flex items-center justify-center gap-2" onclick="handleSignup()" id="btn-signup">
+              <span>Create Account</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PAGE: OTP ===================== -->
+<div id="page-otp" class="page">
+  <div class="flex min-h-screen items-center justify-center px-4">
+    <div class="w-full max-w-sm fade-up">
+      <div class="glass rounded-2xl p-8 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-500/20 flex items-center justify-center mx-auto mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </div>
+        <h2 class="font-display text-xl font-bold mb-2">Verify your email</h2>
+        <p class="text-sm mb-1" style="color:var(--muted)">We sent a 6-digit OTP to</p>
+        <p class="text-sm font-medium mb-6" id="otp-email-display" style="color:var(--accent)">—</p>
+        <div class="flex gap-2 justify-center mb-6" id="otp-inputs">
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,0)" onkeydown="otpBack(event,0)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,1)" onkeydown="otpBack(event,1)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,2)" onkeydown="otpBack(event,2)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,3)" onkeydown="otpBack(event,3)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,4)" onkeydown="otpBack(event,4)"/>
+          <input type="text" maxlength="1" class="otp-box" oninput="otpNav(this,5)" onkeydown="otpBack(event,5)"/>
+        </div>
+        <button class="btn-primary w-full flex items-center justify-center gap-2" onclick="verifyOTP()" id="btn-verify-otp">
+          <span>Verify & Continue</span>
+        </button>
+        <div class="mt-4 flex items-center justify-center gap-2">
+          <span class="text-xs" style="color:var(--muted)">Didn't receive?</span>
+          <button class="text-xs font-medium" style="color:var(--accent);background:none;border:none;cursor:pointer;" onclick="resendOTP()" id="btn-resend">Resend OTP</button>
+        </div>
+        <div id="otp-timer" class="text-xs mt-1" style="color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SHARED NAV ===================== -->
+<div id="main-nav" class="hidden">
+  <nav class="navbar">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-400 flex items-center justify-center text-white font-display font-bold text-sm">F</div>
+      <span class="font-display font-bold text-base" style="background:linear-gradient(135deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">FREESURF</span>
+    </div>
+    <div class="flex items-center gap-1 hidden md:flex" id="nav-links">
+      <button class="nav-link active" onclick="showDashboard()">Dashboard</button>
+      <button class="nav-link"        onclick="showProfile()">Profile</button>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-xs px-2 py-1 rounded-full" id="nav-role-badge" style="background:rgba(56,189,248,0.1);color:var(--accent);border:1px solid rgba(56,189,248,0.2);font-family:'Syne',sans-serif;font-weight:600;"></div>
+      <div class="avatar" id="nav-avatar" onclick="toggleUserMenu()">U</div>
+      <div id="user-menu" class="hidden absolute right-4 top-16 glass-sm rounded-xl p-2 min-w-40 z-50">
+        <div class="px-3 py-2 border-b mb-1" style="border-color:var(--border)">
+          <div class="text-xs font-medium" id="menu-name"  style="color:var(--text)">—</div>
+          <div class="text-xs mt-0.5"      id="menu-email" style="color:var(--muted)">—</div>
+        </div>
+        <button class="w-full text-left px-3 py-2 text-xs rounded-lg transition-colors hover:bg-white/5" style="color:var(--muted);font-family:'DM Sans',sans-serif;" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- ===================== PAGE: FREELANCER DASHBOARD ===================== -->
+<div id="page-freelancer" class="page">
+  <div id="main-nav-f"></div>
+  <div class="flex">
+    <aside class="sidebar hidden md:block">
+      <div class="space-y-1">
+        <div class="sidebar-item active" onclick="setFTab('projects')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Browse Projects
+        </div>
+        <div class="sidebar-item" onclick="setFTab('mybids')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> My Bids
+        </div>
+        <div class="sidebar-item" onclick="showProfile()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Profile
+        </div>
+      </div>
+    </aside>
+    <main class="flex-1 p-6 max-w-5xl">
+      <div class="mb-6 fade-up">
+        <h1 class="font-display text-2xl font-bold mb-1">Good to see you, <span id="f-name-display">Freelancer</span> 👋</h1>
+        <p class="text-sm" style="color:var(--muted)">Here's what's happening on FREESURF today.</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 fade-up fade-up-d1">
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Active Bids</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent)" id="stat-bids">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Projects Won</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent3)">3</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Earnings</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent2)">$4,200</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Rating</div>
+          <div class="font-display text-2xl font-bold" style="color:#fbbf24">4.8 ⭐</div>
+        </div>
+      </div>
+      <div id="f-tab-projects">
+        <div class="flex items-center justify-between mb-4 fade-up fade-up-d2">
+          <h2 class="font-display font-bold text-base">Available Projects</h2>
+          <div class="text-xs" style="color:var(--muted)" id="project-count">— projects</div>
+        </div>
+        <div id="projects-list" class="space-y-4 fade-up fade-up-d3"></div>
+      </div>
+      <div id="f-tab-mybids" class="hidden">
+        <h2 class="font-display font-bold text-base mb-4">My Submitted Bids</h2>
+        <div id="mybids-list" class="space-y-4"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== PAGE: COMPANY DASHBOARD ===================== -->
+<div id="page-company" class="page">
+  <div class="flex">
+    <aside class="sidebar hidden md:block">
+      <div class="space-y-1">
+        <div class="sidebar-item active" onclick="setCTab('projects')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> My Projects
+        </div>
+        <div class="sidebar-item" onclick="showProfile()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Profile
+        </div>
+      </div>
+    </aside>
+    <main class="flex-1 p-6 max-w-5xl">
+      <div class="mb-6 fade-up flex items-center justify-between">
+        <div>
+          <h1 class="font-display text-2xl font-bold mb-1">Company Dashboard 🏢</h1>
+          <p class="text-sm" style="color:var(--muted)">Manage your posted projects and incoming bids.</p>
+        </div>
+        <button class="btn-primary flex items-center gap-2" onclick="openPostModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Post Project
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mb-8 fade-up fade-up-d1">
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Total Projects</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent)" id="c-stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">Bids Received</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent3)" id="c-stat-bids">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="text-xs mb-1" style="color:var(--muted)">In Progress</div>
+          <div class="font-display text-2xl font-bold" style="color:var(--accent2)" id="c-stat-progress">0</div>
+        </div>
+      </div>
+      <div id="company-projects-list" class="space-y-4 fade-up fade-up-d2"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ===================== PAGE: PROFILE ===================== -->
+<div id="page-profile" class="page">
+  <main class="max-w-2xl mx-auto p-6">
+    <div class="flex items-center justify-between mb-6 fade-up">
+      <div>
+        <h1 class="font-display text-2xl font-bold">My Profile</h1>
+        <p class="text-sm mt-0.5" style="color:var(--muted)">Keep your info up to date.</p>
+      </div>
+      <button class="btn-ghost" onclick="showDashboard()">← Back</button>
+    </div>
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d1">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-medium" style="font-family:'Syne',sans-serif;">Profile Completion</span>
+        <span class="text-sm font-bold" id="profile-pct" style="color:var(--accent)">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="profile-bar" style="width:0%"></div></div>
+    </div>
+    <div class="glass rounded-2xl p-6 space-y-4 mb-5 fade-up fade-up-d2">
+      <h3 class="font-display font-bold text-sm mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Personal Info</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Full Name</label>
+          <input id="p-name" type="text" class="inp" placeholder="John Doe" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Email</label>
+          <input id="p-email" type="email" class="inp" placeholder="you@example.com" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Date of Birth</label>
+          <input id="p-dob" type="date" class="inp" oninput="updateProgress()" style="color-scheme:dark;"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Phone</label>
+          <input id="p-phone" type="tel" class="inp" placeholder="+91 98765 43210" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Location</label>
+          <input id="p-location" type="text" class="inp" placeholder="Bangalore, India" oninput="updateProgress()"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Bio</label>
+        <textarea id="p-bio" class="inp" placeholder="Tell clients about yourself..." oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d3">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Skills</h3>
+      <div id="skills-container" class="flex flex-wrap gap-2 mb-3"></div>
+      <div class="flex gap-2">
+        <input id="skill-input" type="text" class="inp" placeholder="Add a skill (e.g. React)" onkeydown="if(event.key==='Enter'){addSkill();}"/>
+        <button class="btn-primary px-4" onclick="addSkill()">Add</button>
+      </div>
+    </div>
+    <div class="glass rounded-2xl p-6 mb-5 fade-up fade-up-d4">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Work Preferences</h3>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Hourly Rate ($)</label>
+          <input id="p-rate" type="number" class="inp" placeholder="50" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Experience</label>
+          <select id="p-exp" class="inp" oninput="updateProgress()" style="cursor:pointer;">
+            <option value="" style="background:#0e1422;">Select level</option>
+            <option value="beginner" style="background:#0e1422;">Beginner</option>
+            <option value="intermediate" style="background:#0e1422;">Intermediate</option>
+            <option value="expert" style="background:#0e1422;">Expert</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Availability</label>
+          <select id="p-avail" class="inp" oninput="updateProgress()" style="cursor:pointer;">
+            <option value="" style="background:#0e1422;">Select</option>
+            <option value="fulltime" style="background:#0e1422;">Full-time</option>
+            <option value="parttime" style="background:#0e1422;">Part-time</option>
+            <option value="freelance" style="background:#0e1422;">Freelance Only</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="glass rounded-2xl p-6 mb-6 fade-up">
+      <h3 class="font-display font-bold text-sm mb-4" style="color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Links</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">GitHub</label>
+          <input id="p-github" type="url" class="inp" placeholder="https://github.com/you" oninput="updateProgress()"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">LinkedIn</label>
+          <input id="p-linkedin" type="url" class="inp" placeholder="https://linkedin.com/in/you" oninput="updateProgress()"/>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary w-full py-3 fade-up" onclick="saveProfile()">Save Profile</button>
+  </main>
+</div>
+
+<!-- ===================== MODAL: BID ===================== -->
+<div class="modal-overlay" id="modal-bid">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display font-bold text-lg">Place Your Bid</h3>
+      <button class="btn-ghost px-3 py-1.5 text-xs" onclick="closeBidModal()">✕</button>
+    </div>
+    <!-- FIX #6: populated dynamically by openBidModal() — never blank -->
+    <div id="bid-project-info" class="glass-sm rounded-xl p-4 mb-5 text-sm" style="color:var(--muted)"></div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Your Bid Amount ($)</label>
+        <!-- FIX #2: min="1" prevents browser from accepting 0/negative -->
+        <input id="bid-amount" type="number" class="inp" placeholder="e.g. 800" min="1"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Proposal / Cover Letter</label>
+        <textarea id="bid-proposal" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Write your proposal..."></textarea>
+      </div>
+      <button class="btn-primary px-4 py-2" onclick="submitBid()">Submit Bid</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: POST PROJECT ===================== -->
+<div class="modal-overlay" id="modal-post">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display font-bold text-lg">Post a New Project</h3>
+      <button class="btn-ghost px-3 py-1.5 text-xs" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Project Title</label>
+        <input id="post-title" type="text" class="inp" placeholder="e.g. Build a React E-commerce App"/>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Description</label>
+        <textarea id="post-desc" class="inp" placeholder="Describe what you need..."></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Budget ($)</label>
+          <input id="post-budget" type="number" class="inp" placeholder="2000"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Deadline</label>
+          <input id="post-deadline" type="date" class="inp" style="color-scheme:dark;"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium mb-1.5" style="color:var(--muted)">Required Skills (comma-separated)</label>
+        <input id="post-skills" type="text" class="inp" placeholder="React, Node.js, MongoDB"/>
+      </div>
+      <button class="btn-primary w-full" onclick="postProject()">Post Project</button>
+    </div>
+  </div>
+</div>
+
+<!--View Bids-->
+
+<div class="modal-overlay" id="modal-view-bids">
+  <div class="modal-box" style="max-width: 600px;">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="font-display font-bold text-lg" id="view-bids-title">Bids for Project</h3>
+        <p class="text-xs mt-1" style="color:var(--muted)">Review proposals from freelancers.</p>
+      </div>
+      <button class="btn-ghost px-3 py-1.5 text-xs" onclick="closeViewBidsModal()">✕</button>
+    </div>
+    
+    <div id="bids-list-container" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+       </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// EMAILJS CONFIG
+// ============================================================
+const EMAILJS_PUBLIC_KEY       = 'LWuZwk37r9Cldq856';
+const EMAILJS_SERVICE_ID       = 'service_009ihwu';
+const EMAILJS_OTP_TEMPLATE     = 'template_6y4aick';
+const EMAILJS_CONFIRM_TEMPLATE = 'template_uxoj5cd';
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+// ============================================================
+// APP STATE
+// FIX #1 — currentBidProjectId was never declared. Every bid submit
+//           read it as undefined, so projectId was always falsy and
+//           the "Missing required bid fields" toast fired immediately.
+// ============================================================
+let currentUser         = null;
+let selectedRole        = 'freelancer';
+let pendingOTP          = null;
+let pendingSignupData   = null;
+let otpTimerInterval    = null;
+let submittedBids       = {};     // { [projectId]: {amount, proposal, title, budget} }
+let currentBidProjectId = null;   // FIX #1: properly declared
+
+// ============================================================
+// AUTH HELPERS
+// ============================================================
+function switchAuthTab(tab) {
+  document.getElementById('form-login').classList.toggle('hidden',  tab !== 'login');
+  document.getElementById('form-signup').classList.toggle('hidden', tab !== 'signup');
+  document.getElementById('tab-login').classList.toggle('active',   tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active',  tab === 'signup');
+}
+
+function selectRole(role) {
+  selectedRole = role;
+  document.getElementById('role-freelancer').classList.toggle('selected', role === 'freelancer');
+  document.getElementById('role-company').classList.toggle('selected',    role === 'company');
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.innerHTML = `<span class="spinner"></span><span>Please wait...</span>`;
+    btn.disabled  = true;
+  } else {
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showToast('Enter a valid email address.', 'error');
+  if (!password || password.length < 6)        return showToast('Password must be at least 6 characters.', 'error');
+
+  setLoading('btn-login', true);
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+    setLoading('btn-login', false);
+    document.getElementById('btn-login').innerHTML = '<span>Continue</span>';
+
+    if (response.ok) {
+      currentUser = data.user;
+      localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
+      showToast('Logged in successfully! 👋', 'success');
+      loadDashboard();
+    } else {
+      showToast(data.message || 'Login failed', 'error');
+    }
+  } catch (error) {
+    setLoading('btn-login', false);
+    document.getElementById('btn-login').innerHTML = '<span>Continue</span>';
+    showToast('Cannot connect to backend server. Is it running?', 'error');
+  }
+}
+
+// ============================================================
+// SIGNUP
+// ============================================================
+function handleSignup() {
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm  = document.getElementById('signup-confirm').value;
+
+  if (!name)                                  return showToast('Please enter your name.', 'error');
+  if (!email || !/\S+@\S+\.\S+/.test(email)) return showToast('Enter a valid email.', 'error');
+  if (password.length < 8)                    return showToast('Password must be at least 8 characters.', 'error');
+  if (password !== confirm)                   return showToast('Passwords do not match.', 'error');
+
+  setLoading('btn-signup', true);
+  pendingSignupData = { name, email, password, role: selectedRole };
+
+  setTimeout(() => {
+    setLoading('btn-signup', false);
+    document.getElementById('btn-signup').innerHTML = '<span>Create Account</span>';
+    startOTP(email, 'signup');
+  }, 600);
+}
+
+// ============================================================
+// OTP SYSTEM
+// ============================================================
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function startOTP(email, context) {
+  pendingOTP = generateOTP();
+  document.getElementById('otp-email-display').textContent = email;
+  clearOTPInputs();
+  showPage('otp');
+  startOTPTimer(120);
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_OTP_TEMPLATE, {
+    to_email: email,
+    to_name:  pendingSignupData ? pendingSignupData.name : (currentUser ? currentUser.name : 'User'),
+    otp:      pendingOTP,
+    context:  context === 'signup' ? 'sign up' : 'log in',
+  }).then(() => {
+    showToast('OTP sent to your email! ✉️', 'success');
+  }).catch(err => {
+    console.warn('EmailJS OTP send failed:', err);
+    showToast(`OTP: ${pendingOTP} (EmailJS not configured — check console)`, 'info');
+  });
+
+  setTimeout(() => { document.querySelectorAll('.otp-box')[0].focus(); }, 200);
+}
+
+function clearOTPInputs() {
+  document.querySelectorAll('.otp-box').forEach(b => b.value = '');
+}
+function otpNav(input, idx) {
+  input.value = input.value.replace(/\D/g, '').slice(-1);
+  if (input.value && idx < 5) document.querySelectorAll('.otp-box')[idx + 1].focus();
+}
+function otpBack(e, idx) {
+  if (e.key === 'Backspace' && !e.target.value && idx > 0)
+    document.querySelectorAll('.otp-box')[idx - 1].focus();
+}
+function getEnteredOTP() {
+  return [...document.querySelectorAll('.otp-box')].map(b => b.value).join('');
+}
+
+async function verifyOTP() {
+  const entered = getEnteredOTP();
+  if (entered.length < 6) return showToast('Please enter all 6 digits.', 'error');
+
+  setLoading('btn-verify-otp', true);
+
+  if (entered === pendingOTP) {
+    clearInterval(otpTimerInterval);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(pendingSignupData)
+      });
+      const data = await response.json();
+      document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+      document.getElementById('btn-verify-otp').disabled  = false;
+
+      if (response.ok) {
+        currentUser = data.user;
+        localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_CONFIRM_TEMPLATE, {
+          to_email: currentUser.email,
+          to_name:  currentUser.name,
+          action:   'Account Created',
+        }).catch(() => {});
+        pendingSignupData = null;
+        pendingOTP        = null;
+        showToast('Welcome to FREESURF! 🏄', 'success');
+        loadDashboard();
+      } else {
+        showToast(data.message || 'Signup failed', 'error');
+      }
+    } catch (error) {
+      document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+      document.getElementById('btn-verify-otp').disabled  = false;
+      showToast('Cannot connect to backend server. Is it running?', 'error');
+    }
+  } else {
+    document.getElementById('btn-verify-otp').innerHTML = '<span>Verify & Continue</span>';
+    document.getElementById('btn-verify-otp').disabled  = false;
+    showToast('Incorrect OTP. Try again.', 'error');
+  }
+}
+
+function resendOTP() {
+  const email = document.getElementById('otp-email-display').textContent;
+  clearOTPInputs();
+  startOTP(email, 'signup');
+  showToast('OTP resent!', 'info');
+}
+
+function startOTPTimer(seconds) {
+  clearInterval(otpTimerInterval);
+  let s           = seconds;
+  const el        = document.getElementById('otp-timer');
+  const resendBtn = document.getElementById('btn-resend');
+  resendBtn.disabled      = true;
+  resendBtn.style.opacity = '0.4';
+  function tick() {
+    el.textContent = `Resend available in ${s}s`;
+    if (s <= 0) {
+      clearInterval(otpTimerInterval);
+      el.textContent          = '';
+      resendBtn.disabled      = false;
+      resendBtn.style.opacity = '1';
+    }
+    s--;
+  }
+  tick();
+  otpTimerInterval = setInterval(tick, 1000);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function loadDashboard() {
+  setupNav();
+  if (currentUser.role === 'freelancer') {
+    showPage('freelancer');
+    document.getElementById('f-name-display').textContent = currentUser.name.split(' ')[0];
+  } else {
+    showPage('company');
+  }
+  fetchAndDisplayProjects();
+}
+
+function setupNav() {
+  document.getElementById('main-nav').classList.remove('hidden');
+  document.getElementById('nav-role-badge').textContent  = currentUser.role === 'freelancer' ? '👨‍💻 Freelancer' : '🏢 Company';
+  document.getElementById('nav-avatar').textContent      = currentUser.name[0].toUpperCase();
+  document.getElementById('menu-name').textContent       = currentUser.name;
+  document.getElementById('menu-email').textContent      = currentUser.email;
+}
+
+function showDashboard() { if (currentUser) loadDashboard(); }
+
+function showProfile() {
+  showPage('profile');
+  document.getElementById('p-name').value  = currentUser.name  || '';
+  document.getElementById('p-email').value = currentUser.email || '';
+  updateProgress();
+  hideUserMenu();
+}
+
+// ============================================================
+// FREELANCER TABS
+// ============================================================
+function setFTab(tab) {
+  document.getElementById('f-tab-projects').classList.toggle('hidden', tab !== 'projects');
+  document.getElementById('f-tab-mybids').classList.toggle('hidden',   tab !== 'mybids');
+  document.querySelectorAll('.sidebar-item').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'projects' && i === 0) || (tab === 'mybids' && i === 1));
+  });
+  if (tab === 'mybids') renderMyBids();
+}
+
+// FIX #3 — removed reference to the deleted sampleProjects array.
+//           title & budget are now stored directly in submittedBids by submitBid().
+function renderMyBids() {
+  const list = document.getElementById('mybids-list');
+  const bids = Object.entries(submittedBids);
+  if (!bids.length) {
+    list.innerHTML = `<div class="glass rounded-2xl p-8 text-center" style="color:var(--muted)">No bids submitted yet. Browse projects to start!</div>`;
+    return;
+  }
+  list.innerHTML = bids.map(([pid, b]) => `
+    <div class="project-card">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-display font-bold text-base mb-1">${b.title || 'Project'}</h3>
+          <p class="text-xs mb-3" style="color:var(--muted)">Budget: $${b.budget || '—'}</p>
+          <p class="text-sm" style="color:var(--muted)">"${b.proposal.slice(0, 80)}${b.proposal.length > 80 ? '…' : ''}"</p>
+        </div>
+        <div class="text-right flex-shrink-0 ml-4">
+          <div class="font-display font-bold text-lg" style="color:var(--accent)">$${b.amount}</div>
+          <span class="tag-green mt-1 block">Submitted</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// BID MODAL
+// FIX #1 — currentBidProjectId now has a proper declaration above
+// FIX #6 — openBidModal receives title & budget and fills the info panel
+// ============================================================
+function openBidModal(projectId, title, budget) {
+  currentBidProjectId = projectId; // FIX #1
+
+  // FIX #6: fill in the project summary so the panel is never blank
+  document.getElementById('bid-project-info').innerHTML =
+    `<strong style="color:var(--text)">${title}</strong>
+     <span class="ml-3" style="color:var(--accent)">Budget: $${Number(budget).toLocaleString()}</span>`;
+
+  document.getElementById('bid-amount').value   = '';
+  document.getElementById('bid-proposal').value = '';
+  document.getElementById('modal-bid').classList.add('open');
+}
+
+function closeBidModal() {
+  document.getElementById('modal-bid').classList.remove('open');
+}
+
+async function submitBid() {
+  const amount    = document.getElementById('bid-amount').value;
+  const proposal  = document.getElementById('bid-proposal').value.trim();
+  const projectId = currentBidProjectId;
+
+  if (!projectId) return showToast('No project selected. Please try again.', 'error');
+  if (!amount || Number(amount) <= 0) return showToast('Enter a valid bid amount.', 'error');
+  if (!proposal) return showToast('Please write a short proposal.', 'error');
+
+  // Safely grab the user ID whether your DB uses _id or id
+  const safeUserId = currentUser._id || currentUser.id;
+
+  if (!safeUserId) {
+      console.error("User ID is missing from currentUser:", currentUser);
+      return showToast('Session error: Could not identify user.', 'error');
+  }
+
+  const bidData = {
+    projectId: projectId,
+    freelancerId: safeUserId, 
+    amount: Number(amount),
+    proposal: proposal
+  };
+
+  // DEBUGGING: Check your browser console to see exactly what is being sent!
+  console.log("Sending bid data to backend:", bidData);
+
+  try {
+    const response = await fetch('http://localhost:5000/api/bids', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(bidData)
+    });
+
+    if (response.ok) {
+      const infoEl = document.getElementById('bid-project-info');
+      submittedBids[projectId] = {
+        amount:   Number(amount),
+        proposal,
+        title:    infoEl.querySelector('strong')?.textContent || 'Project',
+        budget:   infoEl.querySelector('span')?.textContent?.replace(/[^0-9]/g, '') || '0'
+      };
+      document.getElementById('stat-bids').textContent = Object.keys(submittedBids).length;
+
+      closeBidModal();
+      showToast('Bid placed successfully! 🎉', 'success');
+      fetchAndDisplayProjects();
+    } else {
+      const errorData = await response.json();
+      showToast(`Failed: ${errorData.message}`, 'error');
+    }
+  } catch (error) {
+    console.error('Error submitting bid:', error);
+    showToast('Cannot connect to server.', 'error');
+  }
+}
+
+// ============================================================
+// COMPANY DASHBOARD
+// ============================================================
+function setCTab(tab) { fetchAndDisplayProjects(); }
+function openPostModal()  { document.getElementById('modal-post').classList.add('open'); }
+function closePostModal() { document.getElementById('modal-post').classList.remove('open'); }
+
+async function postProject() {
+  const title       = document.getElementById('post-title').value.trim();
+  const description = document.getElementById('post-desc').value.trim();
+  const budget      = document.getElementById('post-budget').value;
+
+  if (!title)                         return showToast('Project title is required.', 'error');
+  if (!description)                   return showToast('Description is required.', 'error');
+  if (!budget || Number(budget) <= 0) return showToast('Enter a valid budget.', 'error');
+
+  try {
+    const response = await fetch('http://localhost:5000/api/projects', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ title, description, budget: Number(budget) })
+    });
+
+    if (response.ok) {
+      closePostModal();
+      showToast('Project posted! 🚀', 'success');
+      document.getElementById('post-title').value  = '';
+      document.getElementById('post-desc').value   = '';
+      document.getElementById('post-budget').value = '';
+      fetchAndDisplayProjects();
+    } else {
+      const errorData = await response.json();
+      showToast(`Failed: ${errorData.message}`, 'error');
+    }
+  } catch (error) {
+    console.error('Error posting project:', error);
+    showToast('Cannot connect to server.', 'error');
+  }
+}
+
+// ============================================================
+// FETCH & RENDER
+// ============================================================
+async function fetchAndDisplayProjects() {
+  try {
+    const response = await fetch('http://localhost:5000/api/projects');
+    if (!response.ok) throw new Error('Failed to fetch');
+    const projects = await response.json();
+    if (currentUser.role === 'freelancer') renderProjects(projects);
+    else renderCompanyProjects(projects);
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    showToast('Failed to load projects from database.', 'error');
+  }
+}
+
+function renderProjects(projects) {
+  const list = document.getElementById('projects-list');
+  document.getElementById('project-count').textContent = `${projects.length} projects`;
+
+  if (!projects.length) {
+    list.innerHTML = `<div class="glass rounded-2xl p-8 text-center" style="color:var(--muted)">No projects available right now.</div>`;
+    return;
+  }
+
+  list.innerHTML = projects.map(p => {
+    const bid      = submittedBids[p._id];
+    // FIX #6: pass title & budget so openBidModal can fill the info panel
+    const safeName = (p.title || '').replace(/'/g, "\\'");
+    return `
+    <div class="project-card">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <div>
+          <h3 class="font-display font-bold text-base mb-0.5">${p.title}</h3>
+          <p class="text-xs" style="color:var(--muted)">Budget: $${Number(p.budget).toLocaleString()}</p>
+        </div>
+        <span class="badge-open flex-shrink-0">Open</span>
+      </div>
+      <p class="text-sm mb-4" style="color:var(--text)">${p.description}</p>
+      <div class="flex items-center justify-between">
+        ${bid
+          ? `<div class="flex items-center gap-2">
+               <span class="text-xs" style="color:var(--accent3)">✓ Bid $${bid.amount}</span>
+               <span class="tag-green">Submitted</span>
+             </div>`
+          : `<button class="btn-primary px-4 py-2 text-sm"
+               onclick="openBidModal('${p._id}','${safeName}',${p.budget})">
+               Place Bid
+             </button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCompanyProjects(projects) {
+  const list = document.getElementById('company-projects-list');
+  document.getElementById('c-stat-total').textContent    = projects.length;
+  document.getElementById('c-stat-bids').textContent     = '0';
+  document.getElementById('c-stat-progress').textContent = '0';
+
+  if (!projects.length) {
+    list.innerHTML = `<div class="glass rounded-2xl p-8 text-center" style="color:var(--muted)">You haven't posted any projects yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = projects.map(p => `
+    <div class="project-card">
+      <div class="flex items-start justify-between gap-4 mb-3">
+        <div>
+          <h3 class="font-display font-bold text-base mb-0.5">${p.title}</h3>
+          <p class="text-sm mt-2" style="color:var(--text)">${p.description}</p>
+        </div>
+        <span class="badge-open flex-shrink-0">Open</span>
+      </div>
+      <div class="flex items-center justify-between text-xs mt-4" style="color:var(--muted)">
+        <span>💰 <strong style="color:var(--text)">$${Number(p.budget).toLocaleString()}</strong></span>
+        <<button class="btn-ghost px-3 py-1.5 text-xs"
+          onclick="openViewBidsModal('${p._id}', '${(p.title || '').replace(/'/g, "\\'")}')">View Bids</button>
+      </div>
+    </div>`).join('');
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
+let profileSkills = [];
+
+function addSkill() {
+  const inp = document.getElementById('skill-input');
+  const val = inp.value.trim();
+  if (!val || profileSkills.includes(val)) { inp.value = ''; return; }
+  profileSkills.push(val);
+  inp.value = '';
+  renderSkills();
+  updateProgress();
+}
+function removeSkill(skill) {
+  profileSkills = profileSkills.filter(s => s !== skill);
+  renderSkills();
+  updateProgress();
+}
+function renderSkills() {
+  document.getElementById('skills-container').innerHTML = profileSkills.map(s =>
+    `<span class="skill-chip">${s}<button onclick="removeSkill('${s}')">×</button></span>`
+  ).join('');
+}
+function updateProgress() {
+  const fields = ['p-name','p-email','p-dob','p-phone','p-location','p-bio','p-rate','p-github','p-linkedin'];
+  let filled = fields.filter(id => document.getElementById(id)?.value?.trim()).length;
+  const expEl   = document.getElementById('p-exp');   if (expEl?.value)   filled++;
+  const availEl = document.getElementById('p-avail'); if (availEl?.value) filled++;
+  if (profileSkills.length) filled++;
+  const pct = Math.round((filled / (fields.length + 3)) * 100);
+  document.getElementById('profile-pct').textContent = `${pct}%`;
+  document.getElementById('profile-bar').style.width = `${pct}%`;
+}
+function saveProfile() {
+  const name = document.getElementById('p-name').value.trim();
+  if (name) {
+    currentUser.name = name;
+    localStorage.setItem('freesurf_user', JSON.stringify(currentUser));
+    setupNav();
+  }
+  showToast('Profile saved! ✅', 'success');
+}
+
+// ============================================================
+// VIEW BIDS MODAL (COMPANY)
+// ============================================================
+function closeViewBidsModal() {
+  document.getElementById('modal-view-bids').classList.remove('open');
+}
+
+async function openViewBidsModal(projectId, title) {
+  // Update modal title
+  document.getElementById('view-bids-title').textContent = `Bids for: ${title}`;
+  
+  const container = document.getElementById('bids-list-container');
+  // Show a loading spinner while fetching
+  container.innerHTML = `<div class="text-center py-6"><span class="spinner"></span></div>`;
+  
+  // Open the modal
+  document.getElementById('modal-view-bids').classList.add('open');
+
+  try {
+    // Call your existing backend route!
+    const response = await fetch(`http://localhost:5000/api/bids/project/${projectId}`);
+    
+    if (!response.ok) throw new Error('Failed to fetch bids');
+    
+    const bids = await response.json();
+    renderProjectBids(bids);
+  } catch (error) {
+    console.error('Error fetching bids:', error);
+    container.innerHTML = `<div class="text-center text-sm" style="color:var(--danger)">Failed to load bids.</div>`;
+    showToast('Could not connect to server.', 'error');
+  }
+}
+
+function renderProjectBids(bids) {
+  const container = document.getElementById('bids-list-container');
+  
+  if (!bids || bids.length === 0) {
+    container.innerHTML = `<div class="glass-sm rounded-xl p-6 text-center" style="color:var(--muted)">No bids received for this project yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = bids.map(bid => {
+    // Safely extract freelancer name/email (handles variations in how your backend might return populated data)
+    const fName = bid.freelancerId?.name || bid.freelancer?.name || 'Freelancer';
+    const fEmail = bid.freelancerId?.email || bid.freelancer?.email || '';
+    
+    return `
+    <div class="glass-sm rounded-xl p-4 border" style="border-color:var(--border)">
+      <div class="flex justify-between items-start mb-3">
+        <div class="flex items-center gap-3">
+          <div class="avatar w-10 h-10">${fName.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="font-display font-bold text-sm" style="color:var(--text)">${fName}</div>
+            <div class="text-xs" style="color:var(--muted)">${fEmail}</div>
+          </div>
+        </div>
+        <div class="text-right flex-shrink-0 ml-4">
+          <div class="font-display font-bold text-lg" style="color:var(--accent)">$${bid.amount}</div>
+        </div>
+      </div>
+      <div class="text-sm p-3 rounded-lg leading-relaxed" style="background:rgba(255,255,255,0.02); color:var(--text)">
+        "${bid.proposal}"
+      </div>
+      <div class="mt-4 flex gap-2 justify-end">
+        <button class="btn-primary py-1.5 px-4 text-xs" onclick="showToast('Accept Bid coming soon!','info')">Accept Bid</button>
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// PAGE SYSTEM
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(`page-${name}`);
+  if (page) page.classList.add('active');
+  document.getElementById('main-nav').classList.toggle('hidden', !['freelancer','company','profile'].includes(name));
+  if (name === 'landing') document.getElementById('main-nav').classList.add('hidden');
+}
+
+// ============================================================
+// LOGOUT
+// ============================================================
+function handleLogout() {
+  currentUser         = null;
+  submittedBids       = {};
+  currentBidProjectId = null;
+  pendingOTP          = null;
+  pendingSignupData   = null;
+  showPage('auth');
+  document.getElementById('main-nav').classList.add('hidden');
+  hideUserMenu();
+  showToast('Logged out. See you around! 👋', 'info');
+}
+
+function toggleUserMenu() { document.getElementById('user-menu').classList.toggle('hidden'); }
+function hideUserMenu()    { document.getElementById('user-menu').classList.add('hidden'); }
+document.addEventListener('click', e => {
+  const menu = document.getElementById('user-menu');
+  if (!menu.classList.contains('hidden') &&
+      !e.target.closest('#nav-avatar') &&
+      !e.target.closest('#user-menu')) hideUserMenu();
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimeout;
+function showToast(msg, type = 'success') {
+  const t     = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = `show ${type}`;
+  clearTimeout(toastTimeout);
+  toastTimeout  = setTimeout(() => { t.classList.remove('show'); }, 3200);
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// Init
+showPage('landing');
+</script>
+</body>
+</html>

@@ -1,10 +1,10 @@
-# FREESURF — Freelance Reimagined 🏄
+# FREESURF — Freelance Reimagined
 
 A modern, full-stack freelance platform connecting ambitious companies with world-class freelancers. Post projects, place bids, and close deals — all in one clean platform.
 
 ## Features
 
-### For Freelancers 👨‍💻
+### For Freelancers 
 - **Browse Projects** - Discover live projects from verified companies
 - **Submit Bids** - Submit proposals with custom pricing and timeline
 - **Track Bids** - See all your submitted bids in one place
@@ -12,14 +12,14 @@ A modern, full-stack freelance platform connecting ambitious companies with worl
 - **Build Profile** - Showcase skills, experience, GitHub, LinkedIn, hourly rates
 - **Manage Proposals** - Track bid status and company feedback
 
-### For Companies 🏢
+### For Companies 
 - **Post Projects** - Create and publish projects in minutes
 - **Review Bids** - See competitive proposals from freelancers
 - **Accept Bids** - One-click bid acceptance with auto-rejection of other bids
 - **Track Progress** - Monitor project status from open → in-progress → closed
 - **Build Profile** - Company info, location, mission statement
 
-### Platform Features 🎯
+### Platform Features 
 - **Email Verification** - OTP-based authentication for security
 - **Secure Auth** - Password hashing with bcryptjs
 - **Real-time Updates** - Bids and project status update instantly
@@ -396,35 +396,6 @@ GET /api/bids/project/:projectId
 GET /api/auth/profile/:userId
 ```
 
----
-
-## Customization
-
-### Change Colors
-Edit CSS variables in `freelance.html` (lines 11-22):
-```css
-:root {
-  --bg: #080b14;        /* Dark background */
-  --accent: #38bdf8;    /* Cyan accent */
-  --accent2: #818cf8;   /* Purple accent */
-  --accent3: #34d399;   /* Green accent */
-  /* ... etc */
-}
-```
-
-### Modify UI Text
-Search for hardcoded strings in `freelance.html` and update
-
-### Add New Profile Fields
-1. Add field to User schema in `models/User.js`
-2. Add input in profile page HTML
-3. Update `saveProfile()` in `freelance.html`
-4. Update `showProfile()` to populate the field
-
-### Change API Endpoints
-Update all fetch URLs in `freelance.html` (currently `http://localhost:5000`)
-
----
 
 ## Troubleshooting
 
@@ -460,39 +431,6 @@ Update all fetch URLs in `freelance.html` (currently `http://localhost:5000`)
 
 
 
-### Deploy to Vercel
-1. Frontend: Deploy `freelance.html` as static site
-2. Backend: Deploy Node.js to Vercel serverless functions
-
----
-
-## Performance Optimization
-
-### Frontend
-- Lazy-load project images
-- Minify JavaScript and CSS
-- Cache frequently accessed data
-- Implement infinite scroll for projects
-
-### Backend
-- Add database indexing on frequently queried fields
-- Implement pagination for large result sets
-- Add caching layer (Redis)
-- Monitor API response times
-
-### Database
-```javascript
-// Add indexes to User collection
-db.users.createIndex({ email: 1 });
-
-// Add indexes to Project collection
-db.projects.createIndex({ companyId: 1 });
-db.projects.createIndex({ status: 1 });
-
-// Add indexes to Bid collection
-db.bids.createIndex({ projectId: 1 });
-db.bids.createIndex({ freelancerId: 1 });
-```
 
 ---
 
@@ -525,15 +463,6 @@ db.bids.createIndex({ freelancerId: 1 });
 - ✅ Input validation on backend
 - ✅ User ID verification in API calls
 
-### Recommended
-- 🔲 Add JWT tokens for session management
-- 🔲 Implement rate limiting on auth endpoints
-- 🔲 Add HTTPS/SSL in production
-- 🔲 Validate email domain during signup
-- 🔲 Implement refresh tokens
-- 🔲 Add request logging and monitoring
-- 🔲 Use environment variables for all secrets
-- 🔲 Implement API versioning
 
 ---
 
@@ -576,11 +505,7 @@ For issues, questions, or feature requests:
 
 ---
 
-## Team
 
-Built with ❤️ for the freelance community.
-
----
 
 ## Changelog
 
@@ -594,20 +519,4 @@ Built with ❤️ for the freelance community.
 
 ---
 
-## FAQ
-
-**Q: Is this free to use?**
-A: Yes, FREESURF is open-source and free. Host it yourself.
-
-**Q: Can I white-label this?**
-A: Yes, you can customize branding, colors, and domain.
-
-**Q: How do I enable payments?**
-A: Integrate Stripe or PayPal in the checkout flow.
-
-**Q: What's the maximum file upload size?**
-A: Currently not implemented. Can be added via multer.
-
-**Q: Can freelancers work part-time?**
-A: Yes, availability is set during profile setup.
 
